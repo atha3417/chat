@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chatting Real-Time</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+        />
+    </head>
+    <body>
+        <div class="container mt-5">
+            <h1 class="mb-4">Chatting Real-Time</h1>
+            <div class="mb-4">
+                <form id="chatForm">
+                    <input type="text" id="username" placeholder="Username" />
+                    <input type="text" id="message" placeholder="Pesan" />
+                    <button type="submit">Kirim</button>
+                </form>
+            </div>
+            <div id="chatMessages">
+                <% messages.forEach(message => { %>
+                <p>
+                    <strong><%= message.username %>:</strong> <%=
+                    message.message %>
+                </p>
+                <% }) %>
+            </div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+        <script>
+            const socket = io();
+
+            // Menerima pesan baru dari server
+            socket.on('message', (message) => {
+                const chatMessages = document.getElementById('chatMessages');
+                const p = document.createElement('p');
+                p.innerHTML = `<strong>${message.username}:</strong> ${message.message}`;
+                chatMessages.appendChild(p);
+            });
+
+            // Mengirim pesan ke server
+            const chatForm = document.getElementById('chatForm');
+            chatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const message = document.getElementById('message').value;
+                socket.emit('message', { username, message });
+                document.getElementById('message').value = '';
+            });
+        </script>
+    </body>
+</html>
